@@ -1,0 +1,33 @@
+.container-header {
+  position: relative;
+  margin-bottom: 10px;
+}
+
+.button-delete {
+  border: none;
+  color: black;
+  background-color: transparent;
+  float: right;
+}
+
+.clearfix::after {
+  content: "";
+  clear: both;
+  display: table;
+}
+
+button {
+  background-color: transparent;
+  border: none;
+}
+
+.container-rl {
+  display: inline-block;
+  margin: 0px 3px;
+}
+
+.button-edit {
+  position: absolute;
+  top: 151%;
+  right: -2%;
+}

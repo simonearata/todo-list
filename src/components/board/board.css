@@ -1,0 +1,44 @@
+.container {
+  width: 50%;
+  margin: 20px auto;
+  position: relative;
+  align-items: center;
+  display: flex;
+  flex-direction: column;
+}
+
+.container-notes {
+  display: flex;
+  flex-wrap: wrap;
+}
+
+.button-popup {
+  margin-top: 20px;
+  border-radius: 19px;
+  width: 38px;
+  height: 38px;
+  border: none;
+  background-color: #eeeed0;
+  color: white;
+  font-size: 25px;
+}
+
+.select-tags {
+  display: inline-block;
+  position: absolute;
+  top: 3%;
+  right: 22%;
+}
+
+.notification {
+  position: absolute;
+  left: 0;
+}
+
+.category {
+  margin-right: 50px;
+  border: 1px solid black;
+  border-radius: 20px;
+  padding: 20px 50px;
+  text-align: left;
+}
