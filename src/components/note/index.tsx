@@ -33,10 +33,7 @@ function Note(props: INoteProps) {
           showLeft={props.showLeft}
           showRight={props.showRight}
         />
-        <h4 className="title-nota">
-          {props?.title}, position: {props?.position}, id: {props?.id}, index:
-          {props?.index}
-        </h4>
+        <h4 className="title-nota">{props?.title}</h4>
         {!mini && (
           <div>
             <p>{props?.text}</p>

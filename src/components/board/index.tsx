@@ -27,44 +27,50 @@ function Board(props: IBoard) {
     { title: "Hobby", id: 2 },
     { title: "Lavoro", id: 3 },
   ]);
-  const [notes, setNotes] = useState<INote[]>([
-    {
-      id: 0,
-      title: "nota1",
-      text: "comprare insalata",
-      status: "da completare",
-      categoryId: 1,
-      tags: ["albergo", "casa"],
-      color: NoteColor.Rosa,
-      position: 0,
-    },
-    {
-      id: 1,
-      title: "nota2",
-      text: "comprare carne",
-      status: "da completare",
-      categoryId: 2,
-      tags: ["cibo", "natale"],
-      color: NoteColor.Giallo,
-      position: 10,
-    },
-    {
-      id: 2,
-      title: "nota3",
-      text: "comprare cibo cane",
-      status: "da completare",
-      categoryId: 3,
-      tags: ["animale", "casa", "cibo"],
-      color: NoteColor.Arancione,
-      position: 20,
-    },
-  ]);
+
+  const initialNoteState = localStorage?.getItem("notes");
+  const parsedNotes: INote[] = initialNoteState
+    ? JSON.parse(initialNoteState)
+    : [
+        {
+          id: 0,
+          title: "nota1",
+          text: "comprare insalata",
+          status: "da completare",
+          categoryId: 1,
+          tags: ["albergo", "casa"],
+          color: NoteColor.Rosa,
+          position: 0,
+        },
+        {
+          id: 1,
+          title: "nota2",
+          text: "comprare carne",
+          status: "da completare",
+          categoryId: 1,
+          tags: ["cibo", "natale"],
+          color: NoteColor.Giallo,
+          position: 40,
+        },
+        {
+          id: 2,
+          title: "nota3",
+          text: "comprare cibo cane",
+          status: "da completare",
+          categoryId: 1,
+          tags: ["animale", "casa", "cibo"],
+          color: NoteColor.Arancione,
+          position: 20,
+        },
+      ];
+  const [notes, setNotes] = useState<INote[]>(parsedNotes);
 
   useEffect(() => {
     setHide(true);
     setTimeout(() => {
       setHide(false);
     }, 4000);
+    localStorage.setItem("notes", JSON.stringify(notes));
   }, [notes, setHide]);
 
   const onNewNoteClick = () => {
@@ -76,37 +82,55 @@ function Board(props: IBoard) {
     setSelectedNote(undefined);
   };
 
+  const getNotesByCategoryAndFilter = (id: number) => {
+    return notes
+      .filter((note) => {
+        if (note?.categoryId !== id) return false;
+        return filter === "all" || note?.tags.includes(filter);
+      })
+      .sort((a, b) => a.position - b.position);
+  };
+
+  const switchNotes = (id1: number, id2: number) => {
+    const note1 = [...notes].find((e) => e?.id === id1)?.position;
+    const note2 = [...notes].find((e) => e?.id === id2)?.position;
+
+    const newNotes = [...notes].map((note) => {
+      if (note?.id === id1 && note2 !== undefined) {
+        note.position = note2;
+      }
+      if (note?.id === id2 && note1 !== undefined) {
+        note.position = note1;
+      }
+
+      return note;
+    });
+
+    setNotes(newNotes);
+  };
+
   const moveNote = (id: number, direction: Direction) => {
     let arrayPosition = [...notes];
     const move = arrayPosition.find((e) => {
       return e?.id === id;
     });
-    console.log(move);
-    console.log(categories);
 
-    /* let anchor = arrayPosition[index];
+    if (move) {
+      const categoryNotes = getNotesByCategoryAndFilter(move?.categoryId);
+      const clickedIndex = categoryNotes.findIndex((note) => note?.id === id);
+      const newDirection =
+        categoryNotes[
+          direction === Direction?.Left ? clickedIndex - 1 : clickedIndex + 1
+        ];
 
-    if (index !== 0 && direction === Direction.Left) {
-      arrayPosition[index] = arrayPosition[index - 1];
-      arrayPosition[index - 1] = anchor;
-      setNotes(arrayPosition);
-      console.log(arrayPosition[index]);
+      switchNotes(id, newDirection?.id);
     }
-    if (index !== arrayPosition.length - 1 && direction === Direction.Right) {
-      arrayPosition[index] = arrayPosition[index + 1];
-      arrayPosition[index + 1] = anchor;
-      setNotes(arrayPosition);
-    } */
   };
 
   const insertNote = (note: INote) => {
-    /* let newNotes = [...notes];
-    newNotes[selectedNote] = note;
-    newNotes.push(note);
-    setNotes(newNotes); */
     note.id = notes.length;
     note.position = notes.length * 10;
-    setNotes([...notes, note]); // merge tra stato precedente delle note (notes) e la nuova nota (note)
+    setNotes([...notes, note]);
     onPopupClose();
   };
 
@@ -120,10 +144,6 @@ function Board(props: IBoard) {
     }
     let newNotes = [...notes].map((currentNote) => {
       return newNote.id === currentNote.id ? newNote : currentNote;
-      /* if (newNote.id === currentNote.id) {
-        return newNote;
-      }
-      return currentNote; */
     });
     setNotes(newNotes);
     onPopupClose();
@@ -180,24 +200,20 @@ function Board(props: IBoard) {
       </div>
 
       <div className="container-notes">
-        {/* <div className="category">
-          {categories.map((category) => {
-            return <Category {...category} notes={notes} filter={filter} />;
-          })}
-        </div> */}
-
         <div>
           {categories.map((category) => {
+            const showTitle =
+              getNotesByCategoryAndFilter(category?.id).length === 0;
+
             return (
               <div>
-                <h2>{category?.title}</h2>
+                <h2>{!showTitle ? category?.title : null}</h2>
                 <div className="container-notes">
-                  {notes
-                    ?.filter((note) => {
-                      if (note.categoryId !== category.id) return false;
-                      return filter === "all" || note?.tags.includes(filter);
-                    }) // sort
-                    .map((note, index) => {
+                  {getNotesByCategoryAndFilter(category?.id).map(
+                    (note, index) => {
+                      const showRight =
+                        index ===
+                        getNotesByCategoryAndFilter(note.categoryId).length - 1;
                       return (
                         <Note
                           index={index}
@@ -213,13 +229,14 @@ function Board(props: IBoard) {
                             moveNote(note?.id, Direction.Right);
                           }}
                           showLeft={index === 0}
-                          showRight={index === notes.length - 1}
+                          showRight={showRight}
                           onEdit={() => {
                             editNote(note?.id);
                           }}
                         />
                       );
-                    })}
+                    }
+                  )}
                 </div>
               </div>
             );

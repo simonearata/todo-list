@@ -55,7 +55,7 @@ function Toolbar(props: IToolbar) {
         ) : null}
       </div>
       <button className="button-edit" onClick={props?.onEdit}>
-        {/* <FontAwesomeIcon icon={faEdit} /> */}
+        <FontAwesomeIcon icon={faEdit} />
       </button>
       <GenericModal
         visible={visible}

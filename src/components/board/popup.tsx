@@ -133,7 +133,6 @@ function Popup(props: IPopup) {
               value={noteData?.categoryId}
               onChange={(e: React.ChangeEvent<HTMLSelectElement>) => {
                 onChangeNoteData("categoryId", parseInt(e?.target?.value));
-                console.log(e?.target.value);
               }}
             >
               {props?.categoryList.map((category) => {
