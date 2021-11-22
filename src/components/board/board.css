@@ -12,7 +12,7 @@
   flex-wrap: wrap;
 }
 
-.button-popup {
+.button-formNote {
   margin-top: 20px;
   border-radius: 19px;
   width: 38px;
@@ -21,6 +21,13 @@
   background-color: #eeeed0;
   color: white;
   font-size: 25px;
+}
+
+.button-formCategory {
+  margin-top: 20px;
+  border: none;
+  background-color: #3ddfd1;
+  color: white;
 }
 
 .select-tags {

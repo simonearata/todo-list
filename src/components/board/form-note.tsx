@@ -4,7 +4,7 @@ import { ICategory } from "../../interfaces/i-category";
 import { INote, NoteColor } from "../../interfaces/i-note";
 import "./popup.css";
 
-interface IPopup {
+interface IFormNote {
   categoryList: ICategory[];
   visible: boolean;
   onPopupClose: () => void;
@@ -13,13 +13,13 @@ interface IPopup {
   onUpdateNote: (note: INote) => void;
 }
 
-function Popup(props: IPopup) {
+function FormNote(props: IFormNote) {
   const initialNoteState: INote = {
     id: -1,
     title: "",
     text: "",
     status: "",
-    categoryId: 1,
+    categoryId: -1,
     tags: [],
     color: NoteColor?.Rosa,
     position: -1,
@@ -61,9 +61,6 @@ function Popup(props: IPopup) {
     if (noteData.text === "") {
       return false;
     }
-    /* if (noteData.status === "") {
-      return false;
-    } */
     return true;
   };
 
@@ -135,6 +132,7 @@ function Popup(props: IPopup) {
                 onChangeNoteData("categoryId", parseInt(e?.target?.value));
               }}
             >
+              <option value={-1}>Nessuna Categoria</option>
               {props?.categoryList.map((category) => {
                 return <option value={category.id}>{category.title}</option>;
               })}
@@ -178,4 +176,4 @@ function Popup(props: IPopup) {
   );
 }
 
-export default Popup;
+export default FormNote;
