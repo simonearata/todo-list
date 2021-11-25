@@ -7,6 +7,11 @@ import Nodata from "../nodata";
 import Notification from "../generic-toast/toast";
 import { ICategory } from "../../interfaces/i-category";
 import FormCategory from "./form-category";
+import {
+  ICategoryContext,
+  useCategory,
+} from "../../providers/category-provider";
+import { useNote } from "../../providers/note-provider";
 
 interface IBoard {
   name: string;
@@ -18,58 +23,19 @@ export enum Direction {
 }
 
 function Board(props: IBoard) {
+  const { categories } = useCategory();
+  const {
+    getNotesByCategoryAndFilter,
+    notes,
+    setSelectedNote,
+    arrayTags,
+    filter,
+    setFilter,
+  } = useNote();
+
+  const [visibleCategory, setVisibleCategory] = useState<boolean>(false);
   const [hide, setHide] = useState<boolean>(false);
   const [visible, setVisible] = useState<boolean>(false);
-  const [visibleCategory, setVisibleCategory] = useState<boolean>(false);
-  const [filter, setFilter] = useState("all");
-  const [selectedNote, setSelectedNote] = useState<number | undefined>();
-
-  const initialCategoryState = localStorage?.getItem("categories");
-  const parsedCategories: ICategory[] = initialCategoryState
-    ? JSON.parse(initialCategoryState)
-    : [
-        { title: "Casa", id: 1 },
-        { title: "Hobby", id: 2 },
-        { title: "Lavoro", id: 3 },
-      ];
-  const [categories, setCategories] = useState<ICategory[]>(parsedCategories);
-
-  const initialNoteState = localStorage?.getItem("notes");
-  const parsedNotes: INote[] = initialNoteState
-    ? JSON.parse(initialNoteState)
-    : [
-        {
-          id: 0,
-          title: "nota1",
-          text: "comprare insalata",
-          status: "da completare",
-          categoryId: 1,
-          tags: ["albergo", "casa"],
-          color: NoteColor.Rosa,
-          position: 0,
-        },
-        {
-          id: 1,
-          title: "nota2",
-          text: "comprare carne",
-          status: "da completare",
-          categoryId: 2,
-          tags: ["cibo", "natale"],
-          color: NoteColor.Giallo,
-          position: 40,
-        },
-        {
-          id: 2,
-          title: "nota3",
-          text: "comprare cibo cane",
-          status: "da completare",
-          categoryId: 3,
-          tags: ["animale", "casa", "cibo"],
-          color: NoteColor.Arancione,
-          position: 20,
-        },
-      ];
-  const [notes, setNotes] = useState<INote[]>(parsedNotes);
 
   useEffect(() => {
     setHide(true);
@@ -79,16 +45,8 @@ function Board(props: IBoard) {
     localStorage.setItem("notes", JSON.stringify(notes));
   }, [notes, setHide]);
 
-  useEffect(() => {
-    localStorage.setItem("categories", JSON.stringify(categories));
-  }, [categories]);
-
   const onNewNoteClick = () => {
     setVisible(true);
-  };
-
-  const onNewCategoryClick = () => {
-    setVisibleCategory(true);
   };
 
   const onPopupClose = () => {
@@ -97,140 +55,16 @@ function Board(props: IBoard) {
     setSelectedNote(undefined);
   };
 
-  const getNotesByCategoryAndFilter = (id: number) => {
-    return notes
-      .filter((note) => {
-        if (note?.categoryId !== id) return false;
-        return filter === "all" || note?.tags.includes(filter);
-      })
-      .sort((a, b) => a.position - b.position);
+  const onNewCategoryClick = () => {
+    setVisibleCategory(true);
   };
-
-  const switchNotes = (id1: number, id2: number) => {
-    const note1 = [...notes].find((e) => e?.id === id1)?.position;
-    const note2 = [...notes].find((e) => e?.id === id2)?.position;
-
-    const newNotes = [...notes].map((note) => {
-      if (note?.id === id1 && note2 !== undefined) {
-        note.position = note2;
-      }
-      if (note?.id === id2 && note1 !== undefined) {
-        note.position = note1;
-      }
-
-      return note;
-    });
-
-    setNotes(newNotes);
-  };
-
-  const moveNote = (id: number, direction: Direction) => {
-    let arrayPosition = [...notes];
-    const move = arrayPosition.find((e) => {
-      return e?.id === id;
-    });
-
-    if (move) {
-      const categoryNotes = getNotesByCategoryAndFilter(move?.categoryId);
-      const clickedIndex = categoryNotes.findIndex((note) => note?.id === id);
-      const newDirection =
-        categoryNotes[
-          direction === Direction?.Left ? clickedIndex - 1 : clickedIndex + 1
-        ];
-
-      switchNotes(id, newDirection?.id);
-    }
-  };
-
-  const insertNote = (note: INote) => {
-    note.id = notes.length;
-    note.position = notes.length * 10;
-    setNotes([...notes, note]);
-    onPopupClose();
-  };
-
-  const categoryMax: number[] = categories.map((category) => {
-    return category.id;
-  });
-
-  const insertCategory = (category: ICategory) => {
-    category.id = Math.max(...categoryMax) + 1;
-    setCategories([...categories, category]);
-  };
-
-  /**
-   * Aggiornamento di una nota dato l'oggetto INote
-   * @param note @description Nuovi dati della nota
-   */
-  const updateNote = (newNote: INote) => {
-    if (selectedNote === undefined) {
-      return;
-    }
-    let newNotes = [...notes].map((currentNote) => {
-      return newNote.id === currentNote.id ? newNote : currentNote;
-    });
-    setNotes(newNotes);
-    onPopupClose();
-  };
-
-  /**
-   * Funzione per eliminare una nota
-   * @param index @description Indice della nota da cancellare
-   */
-  const deleteNote = (id: number) => {
-    let arrayNote = [...notes].filter((note) => {
-      if (id === note.id) {
-        return false;
-      }
-      return true;
-    });
-    setNotes(arrayNote);
-  };
-
-  const deleteCategory = (id: number) => {
-    let deletedCat = [...categories].filter((category) => {
-      if (id === category.id) {
-        return false;
-      }
-      return true;
-    });
-    let newNotes = notes.map((note) => {
-      if (id === note?.categoryId) {
-        note.categoryId = -1;
-      }
-      return note;
-    });
-    setNotes(newNotes);
-    setCategories(deletedCat);
-  };
-
-  console.log(categories);
-
-  let arrayTags: string[] = [];
-
-  notes.forEach((note) => {
-    note.tags.forEach((tag) => {
-      if (!arrayTags.includes(tag)) {
-        arrayTags = [...arrayTags, tag];
-      }
-    });
-  });
-
-  const editNote = (id: number) => {
-    setSelectedNote(id);
-    setVisible(true);
-  };
-
-  let selectedNoteData: INote | undefined;
-  if (selectedNote !== undefined) {
-    selectedNoteData = notes[selectedNote];
-  }
 
   const closeNotification = () => {
     setHide(false);
   };
 
   const noCategory: ICategory = { title: "Nessuna categoria", id: -1 };
+  const categoriesList = categories ? categories : [];
 
   return (
     <div className="container">
@@ -246,7 +80,7 @@ function Board(props: IBoard) {
 
       <div className="container-notes">
         <div>
-          {[noCategory, ...categories].map((category) => {
+          {[noCategory, ...categoriesList].map((category) => {
             const showTitle =
               getNotesByCategoryAndFilter(category?.id).length === 0;
 
@@ -263,8 +97,8 @@ function Board(props: IBoard) {
                         <Note
                           index={index}
                           key={"note" + index}
-                          {...note}
-                          onDelete={() => {
+                          {...note} // passaggio dell'oggetto INote come props, al posto di scrivere singolarmente tutti gli attributi (es. tags={note.tags})
+                          /* onDelete={() => {
                             deleteNote(note.id);
                           }}
                           onLeftNote={() => {
@@ -277,7 +111,7 @@ function Board(props: IBoard) {
                           showRight={showRight}
                           onEdit={() => {
                             editNote(note?.id);
-                          }}
+                          }} */
                         />
                       );
                     }
@@ -317,23 +151,17 @@ function Board(props: IBoard) {
 
       {visible && (
         <FormNote
-          categoryList={categories}
-          initialState={selectedNoteData}
+          categoryList={categoriesList}
+          /* initialState={selectedNoteData} */
           visible={true}
           onPopupClose={onPopupClose}
-          onInsertNote={insertNote}
-          onUpdateNote={updateNote}
+          /* onInsertNote={insertNote}
+          onUpdateNote={updateNote} */
         />
       )}
 
       {visibleCategory && (
-        <FormCategory
-          visibleCategory={true}
-          onPopupClose={onPopupClose}
-          onInsertCategory={insertCategory}
-          allCategories={categories}
-          onDeleteCategory={deleteCategory}
-        />
+        <FormCategory visibleCategory={true} onPopupClose={onPopupClose} />
       )}
     </div>
   );

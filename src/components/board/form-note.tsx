@@ -2,18 +2,20 @@ import React, { useState } from "react";
 import { Form, Modal, Button } from "react-bootstrap";
 import { ICategory } from "../../interfaces/i-category";
 import { INote, NoteColor } from "../../interfaces/i-note";
+import { INoteContext, useNote } from "../../providers/note-provider";
 import "./popup.css";
 
 interface IFormNote {
   categoryList: ICategory[];
   visible: boolean;
   onPopupClose: () => void;
-  onInsertNote: (note: INote) => void;
+  // onInsertNote: (note: INote) => void;
   initialState?: INote;
-  onUpdateNote: (note: INote) => void;
+  /* onUpdateNote: (note: INote) => void; */
 }
 
 function FormNote(props: IFormNote) {
+  const { insertNote, selectedNoteData, updateNote }: INoteContext = useNote();
   const initialNoteState: INote = {
     id: -1,
     title: "",
@@ -25,7 +27,7 @@ function FormNote(props: IFormNote) {
     position: -1,
   };
   const [noteData, setNoteData] = useState<INote>(
-    props?.initialState ? props?.initialState : initialNoteState
+    selectedNoteData ? selectedNoteData : initialNoteState
   );
   const [tagInput, setTagInput] = useState<string>("");
 
@@ -41,10 +43,10 @@ function FormNote(props: IFormNote) {
     if (!validateFormData()) {
       return false;
     }
-    if (props.initialState === undefined) {
-      props?.onInsertNote(noteData);
+    if (selectedNoteData === undefined) {
+      insertNote(noteData);
     } else {
-      props?.onUpdateNote(noteData);
+      updateNote(noteData);
     }
     resetFormData();
   };

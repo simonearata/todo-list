@@ -1,15 +1,10 @@
 import React, { useState } from "react";
 import { INote } from "../../interfaces/i-note";
+import { INoteContext, useNote } from "../../providers/note-provider";
 import "./note.css";
 import Toolbar from "./toolbar";
 
 interface INoteProps extends INote {
-  onEdit: () => void;
-  onDelete: () => void;
-  onLeftNote: () => void;
-  onRightNote: () => void;
-  showLeft: boolean;
-  showRight: boolean;
   index: number;
 }
 
@@ -23,16 +18,7 @@ function Note(props: INoteProps) {
   return (
     <div>
       <div className="container-nota" style={{ backgroundColor: props?.color }}>
-        <Toolbar
-          onEdit={props?.onEdit}
-          onRightNote={props?.onRightNote}
-          onLeftNote={props?.onLeftNote}
-          onDelete={props?.onDelete}
-          onToggleNote={onToggleNote}
-          mini={mini}
-          showLeft={props.showLeft}
-          showRight={props.showRight}
-        />
+        <Toolbar noteId={props?.id} mini={mini} />
         <h4 className="title-nota">{props?.title}</h4>
         {!mini && (
           <div>

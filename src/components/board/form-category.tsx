@@ -1,16 +1,20 @@
 import React, { useState } from "react";
 import { Form, Modal, Button } from "react-bootstrap";
 import { ICategory } from "../../interfaces/i-category";
+import {
+  ICategoryContext,
+  useCategory,
+} from "../../providers/category-provider";
 
 interface IFormCategory {
   visibleCategory: boolean;
   onPopupClose: () => void;
-  onInsertCategory: (category: ICategory) => void;
-  allCategories: ICategory[];
-  onDeleteCategory: (id: number) => void;
 }
 
 function FormCategory(props: IFormCategory) {
+  const { categories, deleteCategory, insertCategory }: ICategoryContext =
+    useCategory();
+
   const [categoryData, setCategoryData] = useState<ICategory>({
     id: -1,
     title: "",
@@ -27,7 +31,7 @@ function FormCategory(props: IFormCategory) {
 
   const addCategory = (e: React.FormEvent<HTMLButtonElement>) => {
     e.preventDefault();
-    props?.onInsertCategory(categoryData);
+    insertCategory(categoryData);
   };
 
   return (
@@ -53,12 +57,14 @@ function FormCategory(props: IFormCategory) {
             />
             <button onClick={addCategory}>+</button>
             <ul>
-              {props?.allCategories.map((category) => {
+              {categories?.map((category) => {
                 return (
                   <div>
                     <li>{category?.title} </li>
                     <button
-                      onClick={() => props?.onDeleteCategory(category?.id)}
+                      onClick={() => {
+                        deleteCategory(category?.id);
+                      }}
                     >
                       elimina
                     </button>

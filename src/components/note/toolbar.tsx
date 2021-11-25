@@ -6,43 +6,36 @@ import { faEdit } from "@fortawesome/free-solid-svg-icons";
 import React, { useState } from "react";
 import GenericModal from "../generic-modal";
 import "./toolbar.css";
+import { INoteContext, useNote } from "../../providers/note-provider";
 
 interface IToolbar {
-  onEdit: () => void;
-  onDelete: () => void;
-  onLeftNote: () => void;
-  onRightNote: () => void;
-  onToggleNote: () => void;
   mini: boolean;
-  showLeft: boolean;
-  showRight: boolean;
+  noteId: number;
 }
 
 function Toolbar(props: IToolbar) {
+  const { deleteNote, editNote }: INoteContext = useNote();
   const [visible, setVisible] = useState<boolean>(false);
 
   const showModalOpen = () => {
     setVisible(true);
   };
 
-  const deleteNote = () => {
-    props?.onDelete();
-    setVisible(false);
-  };
-
   const closePopup = () => {
     setVisible(false);
   };
 
+  return null;
+
   return (
     <div className="container-header clearfix">
-      <button className="button-hide" onClick={props?.onToggleNote}>
+      <button className="button-hide" /* onClick={props?.onToggleNote} */>
         {props?.mini ? "+" : "_"}
       </button>
       <button className="button-delete" onClick={showModalOpen}>
         <FontAwesomeIcon icon={faTrashAlt} />
       </button>
-      <div className="container-rl">
+      {/* <div className="container-rl">
         {!props.showLeft ? (
           <button onClick={props?.onLeftNote}>
             <FontAwesomeIcon icon={faArrowLeft} />
@@ -53,8 +46,13 @@ function Toolbar(props: IToolbar) {
             <FontAwesomeIcon icon={faArrowRight} />
           </button>
         ) : null}
-      </div>
-      <button className="button-edit" onClick={props?.onEdit}>
+      </div> */}
+      <button
+        className="button-edit"
+        onClick={() => {
+          editNote(props?.noteId);
+        }}
+      >
         <FontAwesomeIcon icon={faEdit} />
       </button>
       <GenericModal
@@ -62,7 +60,12 @@ function Toolbar(props: IToolbar) {
         title={"eliminazione nota"}
         text={"sicuro di voler eliminare la nota?"}
         buttons={[
-          { text: "elimina", action: deleteNote },
+          {
+            text: "elimina",
+            action: () => {
+              deleteNote(props?.noteId);
+            },
+          },
           { text: "chiudi", action: closePopup },
         ]}
       />
