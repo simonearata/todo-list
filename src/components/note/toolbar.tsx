@@ -7,14 +7,23 @@ import React, { useState } from "react";
 import GenericModal from "../generic-modal";
 import "./toolbar.css";
 import { INoteContext, useNote } from "../../providers/note-provider";
+import { Direction } from "../board";
 
 interface IToolbar {
   mini: boolean;
   noteId: number;
+  onToggleNote: () => void;
+  index: number;
+  showRight: boolean;
 }
 
 function Toolbar(props: IToolbar) {
-  const { deleteNote, editNote }: INoteContext = useNote();
+  const {
+    deleteNote,
+    editNote,
+    moveNote,
+    getNotesByCategoryAndFilter,
+  }: INoteContext = useNote();
   const [visible, setVisible] = useState<boolean>(false);
 
   const showModalOpen = () => {
@@ -25,28 +34,35 @@ function Toolbar(props: IToolbar) {
     setVisible(false);
   };
 
-  return null;
-
+  const showLeft = props?.index === 0;
   return (
     <div className="container-header clearfix">
-      <button className="button-hide" /* onClick={props?.onToggleNote} */>
+      <button className="button-hide" onClick={props?.onToggleNote}>
         {props?.mini ? "+" : "_"}
       </button>
       <button className="button-delete" onClick={showModalOpen}>
         <FontAwesomeIcon icon={faTrashAlt} />
       </button>
-      {/* <div className="container-rl">
-        {!props.showLeft ? (
-          <button onClick={props?.onLeftNote}>
+      <div className="container-rl">
+        {!showLeft ? (
+          <button
+            onClick={() => {
+              moveNote(props?.noteId, Direction.Left);
+            }}
+          >
             <FontAwesomeIcon icon={faArrowLeft} />
           </button>
         ) : null}
         {!props.showRight ? (
-          <button onClick={props?.onRightNote}>
+          <button
+            onClick={() => {
+              moveNote(props?.noteId, Direction.Right);
+            }}
+          >
             <FontAwesomeIcon icon={faArrowRight} />
           </button>
         ) : null}
-      </div> */}
+      </div>
       <button
         className="button-edit"
         onClick={() => {

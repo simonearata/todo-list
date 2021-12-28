@@ -17,6 +17,10 @@ export interface INoteContext {
   selectedNoteData: INote | undefined;
   filter: string;
   setFilter: (filter: string) => void;
+  searchNote: (string: string) => INote[];
+  setNotePopupVisible: (visible: boolean) => void;
+  notePopupVisible: boolean;
+  setNotes: (notes: INote[]) => void;
 }
 
 const initialContext: INoteContext = {
@@ -33,6 +37,10 @@ const initialContext: INoteContext = {
   selectedNoteData: undefined,
   filter: "all",
   setFilter: () => {},
+  searchNote: () => [],
+  setNotePopupVisible: () => {},
+  notePopupVisible: false,
+  setNotes: () => {},
 };
 const NoteContext = createContext<INoteContext>(initialContext);
 
@@ -75,6 +83,7 @@ const NoteProvider: FC<INoteProvider> = (props) => {
       ];
   const [notes, setNotes] = useState<INote[]>(parsedNotes);
   const [filter, setFilter] = useState("all");
+  const [notePopupVisible, setNotePopupVisible] = useState<boolean>(false);
 
   const switchNotes = (id1: number, id2: number) => {
     const note1 = [...notes].find((e) => e?.id === id1)?.position;
@@ -102,7 +111,6 @@ const NoteProvider: FC<INoteProvider> = (props) => {
       return newNote.id === currentNote.id ? newNote : currentNote;
     });
     setNotes(newNotes);
-    // onPopupClose();
   };
 
   const moveNote = (id: number, direction: Direction) => {
@@ -149,7 +157,7 @@ const NoteProvider: FC<INoteProvider> = (props) => {
 
   const editNote = (id: number) => {
     setSelectedNote(id);
-    // setVisible(true);
+    setNotePopupVisible(true);
   };
 
   const deleteNote = (id: number) => {
@@ -166,7 +174,13 @@ const NoteProvider: FC<INoteProvider> = (props) => {
     note.id = notes.length;
     note.position = notes.length * 10;
     setNotes([...notes, note]);
-    // onPopupClose();
+  };
+
+  const searchNote = (string: string) => {
+    return notes.filter((note) => {
+      if (!note.title.includes(string.toLocaleLowerCase())) return false;
+      return true;
+    });
   };
 
   const NoteData: INoteContext = {
@@ -183,6 +197,10 @@ const NoteProvider: FC<INoteProvider> = (props) => {
     setSelectedNote,
     filter,
     setFilter,
+    searchNote,
+    setNotePopupVisible,
+    notePopupVisible,
+    setNotes,
   };
 
   return (

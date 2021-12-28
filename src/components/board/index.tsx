@@ -31,11 +31,14 @@ function Board(props: IBoard) {
     arrayTags,
     filter,
     setFilter,
+    searchNote,
+    setNotePopupVisible,
+    notePopupVisible,
   } = useNote();
 
   const [visibleCategory, setVisibleCategory] = useState<boolean>(false);
   const [hide, setHide] = useState<boolean>(false);
-  const [visible, setVisible] = useState<boolean>(false);
+  const [searchTerms, setSearchTerms] = useState<string>("");
 
   useEffect(() => {
     setHide(true);
@@ -46,11 +49,11 @@ function Board(props: IBoard) {
   }, [notes, setHide]);
 
   const onNewNoteClick = () => {
-    setVisible(true);
+    setNotePopupVisible(true);
   };
 
   const onPopupClose = () => {
-    setVisible(false);
+    setNotePopupVisible(false);
     setVisibleCategory(false);
     setSelectedNote(undefined);
   };
@@ -78,48 +81,63 @@ function Board(props: IBoard) {
         />
       </div>
 
-      <div className="container-notes">
-        <div>
-          {[noCategory, ...categoriesList].map((category) => {
-            const showTitle =
-              getNotesByCategoryAndFilter(category?.id).length === 0;
+      <form>
+        <input
+          type="text"
+          placeholder="cerca nota"
+          onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
+            setSearchTerms(e?.target.value);
+          }}
+        />
+      </form>
 
+      <div>
+        {searchTerms !== "" &&
+          searchNote(searchTerms).map((note, index) => {
+            const showRight =
+              index === getNotesByCategoryAndFilter(note.categoryId).length - 1;
             return (
-              <div>
-                <h2>{!showTitle ? category?.title : null}</h2>
-                <div className="container-notes">
-                  {getNotesByCategoryAndFilter(category?.id).map(
-                    (note, index) => {
-                      const showRight =
-                        index ===
-                        getNotesByCategoryAndFilter(note.categoryId).length - 1;
-                      return (
-                        <Note
-                          index={index}
-                          key={"note" + index}
-                          {...note} // passaggio dell'oggetto INote come props, al posto di scrivere singolarmente tutti gli attributi (es. tags={note.tags})
-                          /* onDelete={() => {
-                            deleteNote(note.id);
-                          }}
-                          onLeftNote={() => {
-                            moveNote(note?.id, Direction.Left);
-                          }}
-                          onRightNote={() => {
-                            moveNote(note?.id, Direction.Right);
-                          }}
-                          showLeft={index === 0}
-                          showRight={showRight}
-                          onEdit={() => {
-                            editNote(note?.id);
-                          }} */
-                        />
-                      );
-                    }
-                  )}
-                </div>
-              </div>
+              <Note
+                index={index}
+                key={"note" + index}
+                {...note} // passaggio dell'oggetto INote come props, al posto di scrivere singolarmente tutti gli attributi (es. tags={note.tags})
+                showRight={showRight}
+              />
             );
           })}
+      </div>
+
+      <div className="container-notes">
+        <div>
+          {searchTerms === "" &&
+            [noCategory, ...categoriesList].map((category) => {
+              const showTitle =
+                getNotesByCategoryAndFilter(category?.id).length === 0;
+
+              return (
+                <div>
+                  <h2>{!showTitle ? category?.title : null}</h2>
+                  <div className="container-notes">
+                    {getNotesByCategoryAndFilter(category?.id).map(
+                      (note, index) => {
+                        const showRight =
+                          index ===
+                          getNotesByCategoryAndFilter(note.categoryId).length -
+                            1;
+                        return (
+                          <Note
+                            index={index}
+                            key={"note" + index}
+                            {...note} // passaggio dell'oggetto INote come props, al posto di scrivere singolarmente tutti gli attributi (es. tags={note.tags})
+                            showRight={showRight}
+                          />
+                        );
+                      }
+                    )}
+                  </div>
+                </div>
+              );
+            })}
         </div>
       </div>
       {notes?.length === 0 && <Nodata />}
@@ -149,14 +167,11 @@ function Board(props: IBoard) {
         </select>
       </div>
 
-      {visible && (
+      {notePopupVisible && (
         <FormNote
           categoryList={categoriesList}
-          /* initialState={selectedNoteData} */
           visible={true}
           onPopupClose={onPopupClose}
-          /* onInsertNote={insertNote}
-          onUpdateNote={updateNote} */
         />
       )}
 

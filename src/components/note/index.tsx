@@ -6,6 +6,7 @@ import Toolbar from "./toolbar";
 
 interface INoteProps extends INote {
   index: number;
+  showRight: boolean;
 }
 
 function Note(props: INoteProps) {
@@ -18,7 +19,13 @@ function Note(props: INoteProps) {
   return (
     <div>
       <div className="container-nota" style={{ backgroundColor: props?.color }}>
-        <Toolbar noteId={props?.id} mini={mini} />
+        <Toolbar
+          noteId={props?.id}
+          mini={mini}
+          onToggleNote={onToggleNote}
+          index={props?.index}
+          showRight={props?.showRight}
+        />
         <h4 className="title-nota">{props?.title}</h4>
         {!mini && (
           <div>

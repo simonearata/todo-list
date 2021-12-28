@@ -6,6 +6,7 @@ import React, {
   useState,
 } from "react";
 import { ICategory } from "../../interfaces/i-category";
+import { INoteContext, useNote } from "../note-provider";
 
 const initialContext: ICategoryContext = {
   categories: [],
@@ -32,6 +33,7 @@ const CategoryProvider: FC<ICategoryProvider> = (props) => {
         { title: "Lavoro", id: 3 },
       ];
   const [categories, setCategories] = useState<ICategory[]>(parsedCategories);
+  const { notes, setNotes }: INoteContext = useNote();
 
   useEffect(() => {
     localStorage.setItem("categories", JSON.stringify(categories));
@@ -53,14 +55,14 @@ const CategoryProvider: FC<ICategoryProvider> = (props) => {
       }
       return true;
     });
-    /* let newNotes = notes.map((note) => {
+    let newNotes = notes.map((note) => {
       if (id === note?.categoryId) {
         note.categoryId = -1;
       }
       return note;
     });
     setNotes(newNotes);
-    setCategories(deletedCat); */
+    setCategories(deletedCat);
   };
 
   const categoryData: ICategoryContext = {

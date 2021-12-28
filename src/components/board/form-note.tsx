@@ -45,8 +45,10 @@ function FormNote(props: IFormNote) {
     }
     if (selectedNoteData === undefined) {
       insertNote(noteData);
+      props?.onPopupClose();
     } else {
       updateNote(noteData);
+      props?.onPopupClose();
     }
     resetFormData();
   };
