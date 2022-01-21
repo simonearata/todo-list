@@ -23,6 +23,7 @@ function Toolbar(props: IToolbar) {
     editNote,
     moveNote,
     getNotesByCategoryAndFilter,
+    complete,
   }: INoteContext = useNote();
   const [visible, setVisible] = useState<boolean>(false);
 
@@ -42,6 +43,13 @@ function Toolbar(props: IToolbar) {
       </button>
       <button className="button-delete" onClick={showModalOpen}>
         <FontAwesomeIcon icon={faTrashAlt} />
+      </button>
+      <button
+        onClick={() => {
+          complete(props?.noteId);
+        }}
+      >
+        completa
       </button>
       <div className="container-rl">
         {!showLeft ? (

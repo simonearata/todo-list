@@ -1,5 +1,4 @@
 import React, { useEffect, useState } from "react";
-import { INote, NoteColor } from "../../interfaces/i-note";
 import Note from "../note";
 import "./board.css";
 import FormNote from "./form-note";
@@ -7,10 +6,7 @@ import Nodata from "../nodata";
 import Notification from "../generic-toast/toast";
 import { ICategory } from "../../interfaces/i-category";
 import FormCategory from "./form-category";
-import {
-  ICategoryContext,
-  useCategory,
-} from "../../providers/category-provider";
+import { useCategory } from "../../providers/category-provider";
 import { useNote } from "../../providers/note-provider";
 
 interface IBoard {
@@ -107,6 +103,15 @@ function Board(props: IBoard) {
           })}
       </div>
 
+      <div>
+        {" "}
+        note completate:
+        {notes?.map((note) => {
+          if (note.completeDate === null) return false;
+          return <div>{note.title}</div>;
+        })}
+      </div>
+
       <div className="container-notes">
         <div>
           {searchTerms === "" &&
@@ -124,6 +129,7 @@ function Board(props: IBoard) {
                           index ===
                           getNotesByCategoryAndFilter(note.categoryId).length -
                             1;
+                        if (note.completeDate !== null) return false;
                         return (
                           <Note
                             index={index}

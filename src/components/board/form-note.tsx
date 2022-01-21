@@ -25,6 +25,7 @@ function FormNote(props: IFormNote) {
     tags: [],
     color: NoteColor?.Rosa,
     position: -1,
+    completeDate: null,
   };
   const [noteData, setNoteData] = useState<INote>(
     selectedNoteData ? selectedNoteData : initialNoteState

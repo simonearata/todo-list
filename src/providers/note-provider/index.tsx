@@ -21,6 +21,7 @@ export interface INoteContext {
   setNotePopupVisible: (visible: boolean) => void;
   notePopupVisible: boolean;
   setNotes: (notes: INote[]) => void;
+  complete: (id: number) => void;
 }
 
 const initialContext: INoteContext = {
@@ -41,6 +42,7 @@ const initialContext: INoteContext = {
   setNotePopupVisible: () => {},
   notePopupVisible: false,
   setNotes: () => {},
+  complete: () => {},
 };
 const NoteContext = createContext<INoteContext>(initialContext);
 
@@ -59,6 +61,7 @@ const NoteProvider: FC<INoteProvider> = (props) => {
           tags: ["albergo", "casa"],
           color: NoteColor.Rosa,
           position: 0,
+          completeDate: null,
         },
         {
           id: 1,
@@ -69,6 +72,7 @@ const NoteProvider: FC<INoteProvider> = (props) => {
           tags: ["cibo", "natale"],
           color: NoteColor.Giallo,
           position: 40,
+          completeDate: null,
         },
         {
           id: 2,
@@ -79,6 +83,7 @@ const NoteProvider: FC<INoteProvider> = (props) => {
           tags: ["animale", "casa", "cibo"],
           color: NoteColor.Arancione,
           position: 20,
+          completeDate: null,
         },
       ];
   const [notes, setNotes] = useState<INote[]>(parsedNotes);
@@ -183,6 +188,16 @@ const NoteProvider: FC<INoteProvider> = (props) => {
     });
   };
 
+  const complete = (id: number) => {
+    let arrayComplete = [...notes].map((note) => {
+      if (id === note.id) {
+        note.completeDate = new Date();
+      }
+      return note;
+    });
+    setNotes(arrayComplete);
+  };
+
   const NoteData: INoteContext = {
     selectedNote,
     deleteNote,
@@ -201,6 +216,7 @@ const NoteProvider: FC<INoteProvider> = (props) => {
     setNotePopupVisible,
     notePopupVisible,
     setNotes,
+    complete,
   };
 
   return (

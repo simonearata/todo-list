@@ -1,6 +1,5 @@
 import React, { useState } from "react";
 import { INote } from "../../interfaces/i-note";
-import { INoteContext, useNote } from "../../providers/note-provider";
 import "./note.css";
 import Toolbar from "./toolbar";
 
